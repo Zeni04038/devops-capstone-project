@@ -148,6 +148,12 @@ class TestAccountService(TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 5)
 
+    def test_empty_account_list(self):
+        """It should return an empty list when there are no accounts"""
+        response = self.client.get(f"{BASE_URL}")
+        self.assertEqual(0, len(json.loads(response.text)))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_update_account(self):
         """It should Update an existing Account"""
         # create an Account to update
@@ -162,8 +168,21 @@ class TestAccountService(TestCase):
         updated_account = resp.get_json()
         self.assertEqual(updated_account["name"], "Something Known")
 
+    def test_update_not_exist_account(self):
+        """It should try to update an account that doesn't exist, and fail to"""
+        put_response = self.client.put(
+            f"{BASE_URL}/0",
+            json={}
+        )
+        self.assertEqual(put_response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_account(self):
         """It should Delete an Account"""
         account = self._create_accounts(1)[0]
         resp = self.client.delete(f"{BASE_URL}/{account.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_method_not_allowed(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.delete(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
