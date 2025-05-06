@@ -1,5 +1,3 @@
-import json
-
 """
 Account API Service Test Suite
 
@@ -9,6 +7,7 @@ Test cases can be run with the following:
 """
 import os
 import logging
+import json
 from unittest import TestCase
 from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
