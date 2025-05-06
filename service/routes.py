@@ -77,8 +77,6 @@ def list_accounts():
     This endpoint returns all Accounts as a list
     """
     accounts = Account.all()
-    if not accounts:
-        return json.dumps([], default=str), status.HTTP_200_OK
     return make_response(
         json.dumps(accounts, default=str), status.HTTP_200_OK
     )
