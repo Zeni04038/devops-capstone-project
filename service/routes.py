@@ -13,6 +13,8 @@ from . import app  # Import Flask application
 ############################################################
 # Health Endpoint
 ############################################################
+
+
 @app.route("/health")
 def health():
     """Health Status"""
@@ -22,6 +24,8 @@ def health():
 ######################################################################
 # GET INDEX
 ######################################################################
+
+
 @app.route("/")
 def index():
     """Root URL response"""
@@ -38,6 +42,8 @@ def index():
 ######################################################################
 # CREATE A NEW ACCOUNT
 ######################################################################
+
+
 @app.route("/accounts", methods=["POST"])
 def create_accounts():
     """
@@ -61,23 +67,31 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
-@app.route("/accounts", methods=["GET"])
-def list_accounts():
-    """
-    List all Accounts
-    This endpoint returns all Accounts as a list
-    """
-    accounts = Account.all()
-    if not accounts:
-        return json.dumps([], default=str), status.HTTP_200_OK
-    return make_response(
-        json.dumps(accounts, default=str), status.HTTP_200_OK
-    )
 
+@app.route("/accounts", methods=["GET"])
+def list_all_accounts():
+    """ List all accounts """
+    app.logger.info("Request to list all accounts")
+    account_list = Account.all()
+    app.logger.info("[%s] accounts found.", len(account_list))
+
+    if len(account_list) == 0:
+        # No error status code, because it is not an error
+        # if nothing specific was searched for
+        # and nothing was found in an empty database.
+        response_status = status.HTTP_200_OK
+        message = account_list
+    else:
+        response_status = status.HTTP_200_OK
+        message = [account.serialize() for account in account_list]
+
+    return jsonify(message), response_status
 
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
+
+
 @app.route("/accounts/<int:account_id>", methods=["GET"])
 def get_accounts(account_id):
     """
@@ -93,6 +107,8 @@ def get_accounts(account_id):
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
+
+
 @app.route("/accounts/<int:account_id>", methods=["PUT"])
 def update_accounts(account_id):
     """
@@ -111,6 +127,8 @@ def update_accounts(account_id):
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
+
+
 @app.route("/accounts/<int:account_id>", methods=["DELETE"])
 def delete_account(account_id):
     """
